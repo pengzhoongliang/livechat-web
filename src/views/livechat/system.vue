@@ -12,7 +12,8 @@
         <el-table-column label="id" prop="id" width="120" />
         <el-table-column label="title" align="center" prop="title" width="180" />
           <el-table-column label="url" align="center" prop="url" width="180" />
-          <el-table-column label="performer" align="center" prop="performer" width="180" />
+        <el-table-column label="flag" align="center" prop="flag" width="180" />
+        <el-table-column label="performer" align="center" prop="performer" width="180" />
           <el-table-column label="description" align="center" prop="description" width="180" />
           <el-table-column label="createdBy" align="center" prop="createdBy" width="180" />
         <el-table-column label="operation" align="center" class-name="small-padding fixed-width">
@@ -35,6 +36,10 @@
         <el-form  label-width="100px">
           <el-form-item label="title" prop="title">
             <el-input v-model="videoForm.title"  />
+          </el-form-item>
+          <el-form-item label="flag" prop="flag">
+            <el-radio v-model="videoForm.flag" label="LIVE"/>
+            <el-radio v-model="videoForm.flag" label="HISTORY"/>
           </el-form-item>
           <el-form-item label="description" prop="description">
             <el-input v-model="videoForm.description"  />
@@ -67,7 +72,8 @@
                     url:'',//url
                     performer:'',//演出者
                     description:'',//描述
-                    category:''//类别
+                    category:'',//类别
+                    flag:'LIVE',//
                 },//添加视频表单
                 openEditCore:false,//添加演出者弹框
             }
