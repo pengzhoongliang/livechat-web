@@ -22,6 +22,7 @@
                     size="mini"
                     type="text"
                     icon="el-icon-edit"
+                    @click="getvideoinfo(scope.row)"
             >update</el-button>
             <el-button
                     size="mini"
@@ -32,7 +33,7 @@
         </el-table-column>
       </el-table>
 
-      <el-dialog title="add performer" :visible.sync="openEditCore" width="500px">
+      <el-dialog :title="title" :visible.sync="openEditCore" width="500px">
         <el-form  label-width="100px">
           <el-form-item label="title" prop="title">
             <el-input v-model="videoForm.title"  />
@@ -60,11 +61,12 @@
 </template>
 
 <script>
-    import { listfollower,registervideo } from '@/api/login'
+    import { listfollower,registervideo,getvideoinfo,updatevideo,setvideoflag } from '@/api/login'
     export default {
         name: "system",
         data(){
             return {
+              title:'',//弹出框标题
                 userid:'',
                 videoList:[],//视频列表
                 videoForm:{
@@ -93,6 +95,8 @@
             },
             //添加视频
             handleAdd(){
+              this.title = 'add video';
+              this.videoForm = {};
                 this.openEditCore = true;
             },
             //关闭添加演出者弹框
@@ -101,17 +105,51 @@
             },
             //添加视频
             submitForm(){
+              if (this.videoForm.id != undefined){
+                //修改
+                this.videoForm.videoid = this.videoForm.id;
+                updatevideo(this.videoForm).then(res => {
+                  setvideoflag({
+                    videoid:this.videoForm.videoid,
+                    flag:this.videoForm.flag
+                  }).then(red => {
+                  if (res.code === 100 && red.code === 100){
+                    this.openEditCore = false;
+                    this.msgSuccess("update success!");
+                    this.getVideos(this.userid);
+                  }else {
+                    this.$message.error('error!');
+                  }
+                  })
+                })
+              }else {
+                //新增
                 this.videoForm.performer = this.userid;
                 registervideo(this.videoForm).then(res => {
-                    if (res.code === 100){
-                        this.openEditCore = false;
-                        this.msgSuccess("add success!");
-                        this.getVideos(this.userid);
-                    }else {
-                        this.$message.error('error!');
-                    }
+                  if (res.code === 100){
+                    this.openEditCore = false;
+                    this.msgSuccess("add success!");
+                    this.getVideos(this.userid);
+                  }else {
+                    this.$message.error('error!');
+                  }
                 })
+              }
+
             },
+          //查询单个视频
+          getvideoinfo(data){
+            this.title = 'update video'
+            getvideoinfo({
+              videoid:data.id,
+              flag:data.flag
+            }).then(res => {
+              this.openEditCore = true
+              if (res.code === 100){
+                this.videoForm = res.data;
+                }
+              })
+          },
 
         }
     }

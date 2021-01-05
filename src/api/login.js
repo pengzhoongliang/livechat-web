@@ -69,7 +69,30 @@ export function registervideo(data) {
     data:data
   })
 }
-
+//查询单个视频
+export function getvideoinfo(data) {
+  return request({
+    url: '/performer/getvideoinfo',
+    method: 'get',
+    params:data
+  })
+}
+//修改视频
+export function updatevideo(data) {
+  return request({
+    url: '/performer/updatevideo',
+    method: 'post',
+    params:data
+  })
+}
+//修改视频flag
+export function setvideoflag(data) {
+  return request({
+    url: '/performer/setvideoflag',
+    method: 'post',
+    params:data
+  })
+}
 export function registerUser(data) {
   return request({
     url: '/core/registerUser',
