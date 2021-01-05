@@ -93,6 +93,22 @@ export function setvideoflag(data) {
     params:data
   })
 }
+//获取演出者信息
+export function getmyprofile(data) {
+  return request({
+    url: '/performer/getmyprofile',
+    method: 'get',
+    params:data
+  })
+}
+//删除视频
+export function deleteVideo(data) {
+  return request({
+    url: '/performer/deleteVideo',
+    method: 'post',
+    params:data
+  })
+}
 export function registerUser(data) {
   return request({
     url: '/core/registerUser',

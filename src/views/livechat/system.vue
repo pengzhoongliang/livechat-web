@@ -28,6 +28,7 @@
                     size="mini"
                     type="text"
                     icon="el-icon-delete"
+                    @click="deleteById(scope.row)"
             >delete</el-button>
           </template>
         </el-table-column>
@@ -61,7 +62,7 @@
 </template>
 
 <script>
-    import { listfollower,registervideo,getvideoinfo,updatevideo,setvideoflag } from '@/api/login'
+    import { listfollower,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
     export default {
         name: "system",
         data(){
@@ -69,6 +70,7 @@
               title:'',//弹出框标题
                 userid:'',
                 videoList:[],//视频列表
+              performer:'',//演出者名称
                 videoForm:{
                     title:'',//标题
                     url:'',//url
@@ -82,6 +84,7 @@
         },
         created() {
             this.userid = sessionStorage.getItem('id');
+            this.getUserInfo(sessionStorage.getItem('id'));
             this.getVideos(sessionStorage.getItem('id'));
         },
         methods:{
@@ -124,7 +127,8 @@
                 })
               }else {
                 //新增
-                this.videoForm.performer = this.userid;
+                this.videoForm.performer = this.performer;
+                console.log(this.videoForm);
                 registervideo(this.videoForm).then(res => {
                   if (res.code === 100){
                     this.openEditCore = false;
@@ -137,6 +141,17 @@
               }
 
             },
+          //获取用户信息
+          getUserInfo(id){
+            getmyprofile({
+              userid:this.userid
+            }).then(res => {
+              if (res.code === 100){
+                this.performer = res.data.alias
+                console.log(this.videoForm)
+              }
+            })
+          },
           //查询单个视频
           getvideoinfo(data){
             this.title = 'update video'
@@ -150,7 +165,20 @@
                 }
               })
           },
-
+          //删除单个视频
+          deleteById(row){
+            const id = row.id ;
+            this.$confirm('Confirm Delete', {
+              confirmButtonText: "yes",
+              cancelButtonText: "cancel",
+              type: "warning"
+            }).then(function() {
+              return deleteVideo({videoid:id});
+            }).then(() => {
+              this.getVideos(this.userid);
+              this.msgSuccess("delete success");
+            }).catch(function() {});
+          }
         }
     }
 </script>
