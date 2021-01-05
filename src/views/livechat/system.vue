@@ -35,7 +35,7 @@
       </el-table>
 
       <el-dialog :title="title" :visible.sync="openEditCore" width="500px">
-        <el-form  label-width="100px">
+        <el-form :rules="videoFormRules" ref="videoRef" :model="videoForm" label-width="100px">
           <el-form-item label="title" prop="title">
             <el-input v-model="videoForm.title"  />
           </el-form-item>
@@ -80,6 +80,23 @@
                     flag:'LIVE',//
                 },//添加视频表单
                 openEditCore:false,//添加演出者弹框
+                videoFormRules:{
+                    title: [
+                        { required: true, message: "NOT NULL", trigger: "change" }
+                    ],
+                    url: [
+                        { required: true, message: "NOT NULL", trigger: "change" }
+                    ],
+                    description: [
+                        { required: true, message: "NOT NULL", trigger: "change" }
+                    ],
+                    flag: [
+                        { required: true, message: "NOT NULL", trigger: "change" }
+                    ],
+                    category: [
+                         { required: true, message: "NOT NULL", trigger: "change" }
+                    ],
+                }
             }
         },
         created() {
@@ -99,7 +116,9 @@
             //添加视频
             handleAdd(){
               this.title = 'add video';
-              this.videoForm = {};
+              this.videoForm = {
+                  flag:'LIVE'
+              };
                 this.openEditCore = true;
             },
             //关闭添加演出者弹框
@@ -108,6 +127,8 @@
             },
             //添加视频
             submitForm(){
+                this.$refs["videoRef"].validate(valid => {
+                    if (valid){
               if (this.videoForm.id != undefined){
                 //修改
                 this.videoForm.videoid = this.videoForm.id;
@@ -139,7 +160,8 @@
                   }
                 })
               }
-
+                    }
+                })
             },
           //获取用户信息
           getUserInfo(id){
