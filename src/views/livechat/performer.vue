@@ -132,6 +132,8 @@
             submitForm(){
                 this.$refs["performerRef"].validate(val => {
                     if (val){
+                        if (this.performerForm.id == undefined){
+                            //新增
                 this.$axios({
                     method:'post',
                     url:'https://api.networkgateway.net/api/v1/core/register',
@@ -145,6 +147,10 @@
                         this.$message.error(res.data.data);
                     }
                 })
+                    }else {
+                            //修改
+
+                        }
                     }
                 })
             },
