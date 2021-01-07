@@ -167,6 +167,8 @@
                         this.performerForm = res.data;
                         this.openEditCore = true;
                     }
+                }).catch(err => {
+                    alert(err)
                 })
             }
         }
