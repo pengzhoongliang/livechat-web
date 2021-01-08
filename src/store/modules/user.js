@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import { login, logout, getInfo,getmyprofile } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -55,8 +55,11 @@ const user = {
         login(data).then(res => {
           setToken(res.data.token)
           commit('SET_TOKEN', res.data.token)
-
           sessionStorage.setItem("id",res.data.user.id || 0)
+          sessionStorage.setItem("name",res.data.user.alias || '')
+          getmyprofile({userid:res.id}).then(it => {
+            sessionStorage.setItem("wallet",it.data.wallet || 0)
+          })
           resolve()
         }).catch(error => {
           reject(error)

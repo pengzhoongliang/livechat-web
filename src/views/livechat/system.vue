@@ -7,7 +7,11 @@
                   size="mini"
                   @click="handleAdd"
           >add video</el-button>
-      <el-table :data="videoList">
+      <el-button
+              type="text"
+              style="margin-left: 70%"
+      >My Wallet Balance <font color="black" size="5px">{{wallet}}</font> </el-button>
+      <el-table :data="videoList" empty-text="no data">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="id" prop="id" width="120" />
         <el-table-column label="title" align="center" prop="title" width="180" />
@@ -15,7 +19,7 @@
         <el-table-column label="flag" align="center" prop="flag" width="180" />
         <el-table-column label="performer" align="center" prop="performer" width="180" />
           <el-table-column label="description" align="center" prop="description" width="180" />
-          <el-table-column label="createdBy" align="center" prop="createdBy" width="180" />
+          <el-table-column label="category" align="center" prop="category" width="180" />
         <el-table-column label="operation" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button
@@ -70,7 +74,8 @@
               title:'',//弹出框标题
                 userid:'',
                 videoList:[],//视频列表
-              performer:'',//演出者名称
+                performerName:'',//演出者名称
+                wallet:'',//余额
                 videoForm:{
                     title:'',//标题
                     url:'',//url
@@ -101,7 +106,8 @@
         },
         created() {
             this.userid = sessionStorage.getItem('id');
-            this.getUserInfo(sessionStorage.getItem('id'));
+            this.performerName = sessionStorage.getItem('name');
+            this.wallet = sessionStorage.getItem('wallet');
             this.getVideos(sessionStorage.getItem('id'));
         },
         methods:{
@@ -148,7 +154,7 @@
                 })
               }else {
                 //新增
-                this.videoForm.performer = this.performer;
+                this.videoForm.performer = this.performerName;
                 console.log(this.videoForm);
                 registervideo(this.videoForm).then(res => {
                   if (res.code === 100){
@@ -163,17 +169,6 @@
                     }
                 })
             },
-          //获取用户信息
-          getUserInfo(id){
-            getmyprofile({
-              userid:this.userid
-            }).then(res => {
-              if (res.code === 100){
-                this.performer = res.data.alias
-                console.log(this.videoForm)
-              }
-            })
-          },
           //查询单个视频
           getvideoinfo(data){
             this.title = 'update video'

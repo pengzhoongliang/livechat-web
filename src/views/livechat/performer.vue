@@ -7,7 +7,7 @@
                 size="mini"
                 @click="handleAdd"
         >add performer</el-button>
-        <el-table :data="performerList">
+        <el-table :data="performerList" empty-text="no data">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="id" prop="id" width="120" />
             <el-table-column label="name" align="center" prop="name" width="180" />
@@ -15,6 +15,15 @@
             <el-table-column label="alias" align="center" prop="alias" width="180" />
             <el-table-column label="mobile" align="center" prop="mobile" width="180" />
             <el-table-column label="email" align="center" prop="email" width="180" />
+            <el-table-column label="wallet" align="center" class-name="small-padding fixed-width">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="text"
+                            @click="openWallet(scope.row)"
+                    >{{scope.row.wallet}}</el-button>
+                </template>
+            </el-table-column>
             <el-table-column label="operation" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button
@@ -31,6 +40,33 @@
                 </template>
             </el-table-column>
         </el-table>
+
+        <el-dialog title="performer wallet detail" :visible.sync="walletType" width="500px">
+            <el-form  label-width="100px" :rules="performerRules" :model="performerForm" ref="performerRef">
+                <el-form-item label="name" prop="name">
+                    <el-input v-model="performerForm.name"  />
+                </el-form-item>
+                <el-form-item label="username" prop="username">
+                    <el-input v-model="performerForm.username"  />
+                </el-form-item>
+                <el-form-item label="password" prop="password">
+                    <el-input type="password" :disabled="updPasw" auto-complete="new-password" v-model="performerForm.password"  />
+                </el-form-item>
+                <el-form-item label="alias" prop="alias">
+                    <el-input v-model="performerForm.alias"  />
+                </el-form-item>
+                <el-form-item label="email" prop="email">
+                    <el-input v-model="performerForm.email"  />
+                </el-form-item>
+                <el-form-item label="mobile" prop="mobile">
+                    <el-input v-model="performerForm.mobile"  />
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm">submit</el-button>
+                <el-button @click="cancel">cancel</el-button>
+            </div>
+        </el-dialog>
 
         <el-dialog :title="title" :visible.sync="openEditCore" width="500px">
             <el-form  label-width="100px" :rules="performerRules" :model="performerForm" ref="performerRef">
@@ -72,6 +108,7 @@
                 title:'',
                 updPasw:false,//是否可以修改密码
                 openEditCore:false,//添加演出者弹框
+                walletType:false,//礼物明细弹框
                 performerForm:{
                     name:'',
                     alias:'',
@@ -170,6 +207,10 @@
                 }).catch(err => {
                     alert(err)
                 })
+            },
+            //查询礼物明细
+            openWallet(data){
+                this.walletType = true;
             }
         }
     }
