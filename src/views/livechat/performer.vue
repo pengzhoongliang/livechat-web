@@ -15,12 +15,21 @@
             <el-table-column label="alias" align="center" prop="alias" width="180" />
             <el-table-column label="mobile" align="center" prop="mobile" width="180" />
             <el-table-column label="email" align="center" prop="email" width="180" />
+            <el-table-column label="status" align="center" width="100">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.status"
+                            active-value="1"
+                            inactive-value="2"
+                            @change="handleStatusChange(scope.row)"
+                    ></el-switch>
+                </template>
+            </el-table-column>
             <el-table-column label="wallet" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
                             type="text"
-                            @click="openWallet(scope.row)"
                     >{{scope.row.wallet}}</el-button>
                 </template>
             </el-table-column>
@@ -99,7 +108,7 @@
 </template>
 
 <script>
-    import { performerList,getmyprofile } from '@/api/login'
+    import { performerList,getmyprofile,setperformerstatus,walletListByPerformer } from '@/api/login'
     export default {
         name: "performer",
         data(){
@@ -211,7 +220,23 @@
             //查询礼物明细
             openWallet(data){
                 this.walletType = true;
-            }
+            },
+            //修改演出者状态
+            handleStatusChange(row) {
+                console.log(row.username,row)
+                let text = row.status === "2" ? "start using" : "block up";
+                this.$confirm('sure"' + text + '""' + row.username + '"performer吗?', "warning", {
+                    confirmButtonText: "confirm",
+                    cancelButtonText: "cancel",
+                    type: "warning"
+                }).then(function() {
+                    return setperformerstatus(row.id,row.status);
+                }).then(() => {
+                    this.msgSuccess(text + "success");
+                }).catch(function() {
+                    row.status = row.status === "2" ? "1" : "2";
+                });
+            },
         }
     }
 </script>

@@ -1,13 +1,13 @@
 <template>
   <div class="login">
     <div class="login-inout-back">
-      <div class="login-title-back">
+      <div class="login-title-back">sys
 <!--        <img src="@/assets/image/newImg/favicon.ico">-->
         <span>Live Chat</span>
       </div>
       <img src="@/assets/image/newImg/livechat.jpg" style="width: 400px; height: 200px; position: absolute;left:400px;top:80px;opactiy:0.0"/>
       <el-form class="login-form">
-        <h3 class="title">Live Chat Backstage Management</h3>
+        <h3 class="title">Live Chat Performer Login</h3>
         <el-form-item prop="username">
           <el-input style="width:50%" v-model="loginForm.username" type="text" auto-complete="off" placeholder="username">
             <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -152,6 +152,7 @@
                         }
                       })
                       .catch(() => {
+                        this.$message.error('This account has been disabled!');
                         this.loading = false;
                       });
       }

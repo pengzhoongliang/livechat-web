@@ -10,6 +10,7 @@
       <el-button
               type="text"
               style="margin-left: 70%"
+              @click="getWalletDesc"
       >My Wallet Balance <font color="black" size="5px">{{wallet}}</font> </el-button>
       <el-table :data="videoList" empty-text="no data">
         <el-table-column type="selection" width="55" align="center" />
@@ -54,7 +55,15 @@
             <el-input v-model="videoForm.url"  />
           </el-form-item>
             <el-form-item label="category" prop="category">
-                <el-input v-model="videoForm.category"  />
+               <!-- <el-input v-model="videoForm.category"  />-->
+              <el-select v-model="videoForm.category" placeholder="please select">
+                <el-option
+                        v-for="item in videoType"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                </el-option>
+              </el-select>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -62,11 +71,20 @@
           <el-button @click="cancel">cancel</el-button>
         </div>
       </el-dialog>
+
+      <el-dialog title="wallet particulars" :visible.sync="walletType" width="600px">
+        <el-table :data="walletList" empty-text="no data">
+          <el-table-column label="viewer" align="center" prop="viewer" width="180" />
+          <el-table-column label="token" align="center" prop="token" width="180" />
+          <el-table-column label="time" align="center" prop="updatedDate" width="180" />
+        </el-table>
+      </el-dialog>
     </div>
 </template>
 
 <script>
-    import { listfollower,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
+    import { listfollower,walletListByPerformer,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
+    import { formatDate } from "@/utils/index";
     export default {
         name: "system",
         data(){
@@ -76,6 +94,8 @@
                 videoList:[],//视频列表
                 performerName:'',//演出者名称
                 wallet:'',//余额
+              walletList:[],
+              walletType:false,//钱包明细弹框
                 videoForm:{
                     title:'',//标题
                     url:'',//url
@@ -85,6 +105,20 @@
                     flag:'LIVE',//
                 },//添加视频表单
                 openEditCore:false,//添加演出者弹框
+              //视频类别
+              videoType:{
+                cate:'cate',
+                fashion:'fashion',
+                recreation:'recreation',
+                live:'live',
+                information:'information',
+                game:'game',
+                car:'car',
+                exercise:'exercise',
+                music:'music',
+                cartoon:'cartoon',
+                health:'health',
+              },
                 videoFormRules:{
                     title: [
                         { required: true, message: "NOT NULL", trigger: "change" }
@@ -107,7 +141,7 @@
         created() {
             this.userid = sessionStorage.getItem('id');
             this.performerName = sessionStorage.getItem('name');
-            this.wallet = sessionStorage.getItem('wallet');
+            this.getWallet(this.userid);
             this.getVideos(sessionStorage.getItem('id'));
         },
         methods:{
@@ -119,6 +153,13 @@
                     }
                 })
             },
+          getWallet(userid){
+            getmyprofile({userid:userid}).then(res => {
+              if (res.code === 100){
+                this.wallet = res.data.wallet
+              }
+            })
+          },
             //添加视频
             handleAdd(){
               this.title = 'add video';
@@ -181,6 +222,18 @@
                 this.videoForm = res.data;
                 }
               })
+          },
+          //查询钱包明细
+          getWalletDesc(){
+            walletListByPerformer().then(res => {
+              if (res.code === 100) {
+                this.walletList = res.data.items
+                this.walletList.map(item => {
+                  item.updatedDate = formatDate(item.updatedDate)
+                })
+                this.walletType = true;
+              }
+            })
           },
           //删除单个视频
           deleteById(row){

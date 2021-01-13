@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '管理系统' // 标题
+const name = 'Live Chat Performer Login' // 标题
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 

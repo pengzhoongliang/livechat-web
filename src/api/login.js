@@ -109,6 +109,26 @@ export function deleteVideo(data) {
     params:data
   })
 }
+//获取钱包明细
+export function walletListByPerformer(data) {
+  return request({
+    url: '/performer/walletListByPerformer',
+    method: 'get',
+    params:data
+  })
+}
+//修改演出者账号状态
+export function setperformerstatus(userid,status) {
+  const data = {
+    userid:userid,
+    status:status
+  }
+  return request({
+    url: '/performer/setperformerstatus',
+    method: 'post',
+    params:data
+  })
+}
 export function registerUser(data) {
   return request({
     url: '/core/registerUser',

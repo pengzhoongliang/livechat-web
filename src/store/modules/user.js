@@ -53,14 +53,15 @@ const user = {
       return new Promise((resolve, reject) => {
         /* "username": "admin" , "password": "not4u2know", "type": "OPERATOR"*/
         login(data).then(res => {
-          setToken(res.data.token)
-          commit('SET_TOKEN', res.data.token)
-          sessionStorage.setItem("id",res.data.user.id || 0)
-          sessionStorage.setItem("name",res.data.user.alias || '')
-          getmyprofile({userid:res.id}).then(it => {
-            sessionStorage.setItem("wallet",it.data.wallet || 0)
-          })
-          resolve()
+          if (res.data.user.status === '1') {
+            setToken(res.data.token)
+            commit('SET_TOKEN', res.data.token)
+            sessionStorage.setItem("id", res.data.user.id || 0)
+            sessionStorage.setItem("name", res.data.user.alias || '')
+            resolve()
+          }else {
+            reject('This account has been disabled');
+          }
         }).catch(error => {
           reject(error)
         })
