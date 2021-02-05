@@ -117,6 +117,14 @@ export function walletListByPerformer(data) {
     params:data
   })
 }
+//结算单日与单月的钱包
+export function closeAnAccount(data) {
+  return request({
+    url: '/user/monthEndToken',
+    method: 'post',
+    params:data
+  })
+}
 //修改演出者账号状态
 export function setperformerstatus(userid,status) {
   const data = {

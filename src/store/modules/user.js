@@ -53,7 +53,7 @@ const user = {
       return new Promise((resolve, reject) => {
         /* "username": "admin" , "password": "not4u2know", "type": "OPERATOR"*/
         login(data).then(res => {
-          if (res.data.user.status === '1') {
+          if (res.data.user.status === '1' || res.data.user.type === 'OPERATOR') {
             setToken(res.data.token)
             commit('SET_TOKEN', res.data.token)
             sessionStorage.setItem("id", res.data.user.id || 0)

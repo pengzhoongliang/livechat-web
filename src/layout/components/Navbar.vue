@@ -92,9 +92,24 @@ export default {
         cancelButtonText: 'cancel',
         type: 'warning'
       }).then(() => {
+        this.logoutRocker();//同时注销聊天
         this.$router.push({path: "/"})
       }).catch(() => {
 
+      })
+    },
+    logoutRocker(){
+      this.$axios({
+        url:'https://api.networkgateway.net:3021/api/v1/logout',
+        method:'post',
+        headers:{
+          'X-Auth-Token': localStorage.getItem('xToken'),
+          'X-User-Id': localStorage.getItem('xId')
+        }
+      }).then(res => {
+        if (res.status === 200){
+          console.log('注销成功')
+        }
       })
     }
   }

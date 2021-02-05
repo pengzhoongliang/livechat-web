@@ -11,18 +11,26 @@
               type="text"
               style="margin-left: 70%"
               @click="getWalletDesc"
-      >My Wallet Balance <font color="black" size="5px">{{wallet}}</font> </el-button>
+      >Received Token Total <font color="black" size="5px">{{wallet}}</font> </el-button>
       <el-table :data="videoList" empty-text="no data">
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="id" prop="id" width="120" />
-        <el-table-column label="title" align="center" prop="title" width="180" />
-          <el-table-column label="url" align="center" prop="url" width="180" />
-        <el-table-column label="flag" align="center" prop="flag" width="180" />
-        <el-table-column label="performer" align="center" prop="performer" width="180" />
-          <el-table-column label="description" align="center" prop="description" width="180" />
-          <el-table-column label="category" align="center" prop="category" width="180" />
-        <el-table-column label="operation" align="center" class-name="small-padding fixed-width">
+        <el-table-column label="Id" prop="id" width="120" />
+        <el-table-column label="Title" align="center" prop="title" width="180" />
+          <el-table-column label="Url" align="center" prop="url" width="180" />
+        <el-table-column label="Flag" align="center" prop="flag" width="180" />
+        <el-table-column label="Performer" align="center" prop="performer" width="180" />
+          <el-table-column label="Account Description" align="center" prop="description" width="180" />
+          <el-table-column label="Category" align="center" prop="category" width="100" />
+        <el-table-column label="Token Total" align="center" prop="wallet" width="100" />
+        <el-table-column label="Like Total" align="center" prop="likelist" width="100" />
+        <el-table-column label="View Total" align="center" prop="followlist" width="100" />
+        <el-table-column label="Operation" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
+            <el-button
+                    size="mini"
+                    type="text"
+                    icon="el-icon-chat-dot-round"
+                    @click="openRocket(scope.row)"
+            >Rocket Chat</el-button>
             <el-button
                     size="mini"
                     type="text"
@@ -79,12 +87,18 @@
           <el-table-column label="time" align="center" prop="updatedDate" width="180" />
         </el-table>
       </el-dialog>
+      <el-dialog title="live chat" :visible.sync="rocketType" width="80%">
+        <iframe id="rocketchat" name="rocketchat" :key="xToken" @load="iFrameLoaded"
+                :src="rocketServer+'/channel/'+rocketId+'?layout=embedded'"
+                style="height: 600px;width: 100%;border: 0"/>
+      </el-dialog>
     </div>
 </template>
 
 <script>
     import { listfollower,walletListByPerformer,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
     import { formatDate } from "@/utils/index";
+    import { getToken } from '@/utils/auth'
     export default {
         name: "system",
         data(){
@@ -94,6 +108,10 @@
                 videoList:[],//视频列表
                 performerName:'',//演出者名称
                 wallet:'',//余额
+              rocketId:'',//视频ID
+              xToken:'',//火箭聊天token
+              rocketServer:'https://api.networkgateway.net:3021',
+              rocketType:false,//火箭聊天是否打开
               walletList:[],
               walletType:false,//钱包明细弹框
                 videoForm:{
@@ -139,6 +157,7 @@
             }
         },
         created() {
+            console.log('created，token是',this.xToken);
             this.userid = sessionStorage.getItem('id');
             this.performerName = sessionStorage.getItem('name');
             this.getWallet(this.userid);
@@ -148,8 +167,13 @@
             //获取演出者视频
             getVideos(id){
                 listfollower({userid:id}).then(res => {
+
                     if (res.code === 100){
                         this.videoList = res.data.items;//赋值视频列表
+                      this.videoList.map(item => {
+                        item.followlist = item.followlist.length;
+                        item.likelist = item.likelist.length;
+                      })
                     }
                 })
             },
@@ -199,6 +223,8 @@
                 console.log(this.videoForm);
                 registervideo(this.videoForm).then(res => {
                   if (res.code === 100){
+                    //添加视频成功同时创建聊天频道
+                    this.channelsCreate(res.data);
                     this.openEditCore = false;
                     this.msgSuccess("add success!");
                     this.getVideos(this.userid);
@@ -210,6 +236,24 @@
                     }
                 })
             },
+          //创建视频聊天频道
+          channelsCreate(name){
+            this.$axios({
+              url:'https://api.networkgateway.net:3021/api/v1/channels.create',
+              method:'post',
+              headers:{
+                'X-Auth-Token': localStorage.getItem('xToken'),
+                'X-User-Id': localStorage.getItem('xId')
+              },
+              data:{
+                name:name
+              }
+            }).then(res => {
+              if (res.status === 200){
+                console.log('创建聊天频道成功');
+              }
+            })
+          },
           //查询单个视频
           getvideoinfo(data){
             this.title = 'update video'
@@ -248,7 +292,36 @@
               this.getVideos(this.userid);
               this.msgSuccess("delete success");
             }).catch(function() {});
-          }
+          },
+          //火箭聊天
+          iFrameLoaded(){
+                this.xToken = localStorage.getItem('xToken');
+              console.log('token是',this.xToken);
+              document.getElementById("rocketchat").contentWindow.postMessage({
+                 externalCommand: 'login-with-token',
+                 token:this.xToken
+             },'*');
+          },
+          //聊天窗口打开
+          openRocket(row){
+            this.rocketId = row.id;
+              //this.rocketId = 'DAFB4072-8E8A-4492-8F18-1BFA19ECAA15'
+            this.rocketType = true;
+          },
+            logout(){
+                this.$axios({
+                    url:'https://api.networkgateway.net:3021/api/v1/logout',
+                    method:'post',
+                    headers:{
+                        'X-Auth-Token': 'rxjMOjxyEMHPpHDMQbFyhgHB1F4WkHxs3cphsoiRoQV',
+                        'X-User-Id': 'ShecmkD7H6enAsbbN'
+                    }
+                }).then(res => {
+                    if (res.status === 200){
+                        alert('注销成功')
+                    }
+                })
+            }
         }
     }
 </script>

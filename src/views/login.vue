@@ -1,13 +1,13 @@
 <template>
   <div class="login">
     <div class="login-inout-back">
-      <div class="login-title-back">sys
+      <div class="login-title-back">
 <!--        <img src="@/assets/image/newImg/favicon.ico">-->
         <span>Live Chat</span>
       </div>
       <img src="@/assets/image/newImg/livechat.jpg" style="width: 400px; height: 200px; position: absolute;left:400px;top:80px;opactiy:0.0"/>
       <el-form class="login-form">
-        <h3 class="title">Live Chat Performer Login</h3>
+        <h3 class="title">Live Chat Operator Management</h3>
         <el-form-item prop="username">
           <el-input style="width:50%" v-model="loginForm.username" type="text" auto-complete="off" placeholder="username">
             <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-  import { getCodeImg } from "@/api/login";
+  import { getCodeImg,getmyprofile } from "@/api/login";
   import Cookies from "js-cookie";
   import { encrypt, decrypt } from "@/utils/jsencrypt";
   import myCaptcha from "@/components/captcha";
@@ -91,7 +91,8 @@
           password: "", //默认密码
         },
         loading: false,
-        redirect: undefined
+        redirect: undefined,
+          email:''
       };
     },
     created() {
@@ -146,8 +147,12 @@
                         //登录成功跳转界面
                         if (this.loginForm.username === 'admin'){
                           this.$router.push({path: "/performer"})
+                            //this.$message.error('Please Login the Performer Account!');
                         } else {
-                          this.$router.push({path: "/system"})
+                            //同时登录火箭聊天
+                            /*this.getUserInfo(sessionStorage.getItem('id'));
+                          this.$router.push({path: "/system"})*/
+                            this.$message.error('Please Login the Operator Account!');
                           console.log('演出者用户')
                         }
                       })
@@ -155,7 +160,59 @@
                         this.$message.error('This account has been disabled!');
                         this.loading = false;
                       });
-      }
+      },
+        //同时登录火箭聊天
+        loginRocket(data){
+            this.$axios({
+                url:'https://api.networkgateway.net:3021/api/v1/login',
+                method:'post',
+                data:{
+                    user:data.username,
+                    password:data.password
+                }
+            }).then(res => {
+                if (res.status === 200){
+                    localStorage.setItem('xToken',res.data.data.authToken);
+                    localStorage.setItem("xId",res.data.data.userId);
+                }
+                //登录成功，保存rocket token
+            }).catch(err => {
+                //未注册，需要注册用户
+                //清除token
+                localStorage.setItem('xToken','');
+                localStorage.setItem("xId",'');
+                this.createRocketChat(data);
+            })
+        },
+        //获取个人信息
+        getUserInfo(userid){
+            getmyprofile({userid:userid}).then(res => {
+                if (res.code === 100){
+                    this.email = res.data.email;
+                    console.log('email',this.email)
+                    this.loginRocket(this.loginForm);
+                }
+            })
+        },
+        //注册rocket.chat
+        createRocketChat(user){
+          let email = this.email;
+          this.$axios({
+              url:'https://api.networkgateway.net:3021/api/v1/users.register',
+              method:'post',
+              data:{
+                name:user.username,
+                  pass:user.password,
+                  username:user.username,
+                  email:email
+              }
+          }).then(res => {
+              if (res.status === 200){
+                  //注册成功，重新登录
+                  this.loginRocket(user);
+              }
+          })
+        }
     }
   };
 </script>

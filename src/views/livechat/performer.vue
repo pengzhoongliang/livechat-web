@@ -10,11 +10,11 @@
         <el-table :data="performerList" empty-text="no data">
             <el-table-column type="selection" width="55" align="center" />
             <el-table-column label="id" prop="id" width="120" />
-            <el-table-column label="name" align="center" prop="name" width="180" />
-            <el-table-column label="username" align="center" prop="username" width="180" />
-            <el-table-column label="alias" align="center" prop="alias" width="180" />
-            <el-table-column label="mobile" align="center" prop="mobile" width="180" />
-            <el-table-column label="email" align="center" prop="email" width="180" />
+            <el-table-column label="name" align="center" prop="name" width="170" />
+            <el-table-column label="username" align="center" prop="username" width="170" />
+            <el-table-column label="alias" align="center" prop="alias" width="170" />
+            <el-table-column label="mobile" align="center" prop="mobile" width="170" />
+            <el-table-column label="email" align="center" prop="email" width="170" />
             <el-table-column label="status" align="center" width="100">
                 <template slot-scope="scope">
                     <el-switch
@@ -25,12 +25,25 @@
                     ></el-switch>
                 </template>
             </el-table-column>
-            <el-table-column label="wallet" align="center" class-name="small-padding fixed-width">
+            <el-table-column label="Payable Total" align="center" prop="paymentwallet" width="110" />
+            <el-table-column label="Current Month Receive Total" align="center" prop="monthwallet" width="110" />
+            <el-table-column label="Cumulated Paid Total" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
                             type="text"
+                            @click="getWalletDesc(scope.row)"
                     >{{scope.row.wallet}}</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column label="Close An Account" align="center" width="110" >
+                <template slot-scope="scope">
+                <el-button
+
+                        type="text"
+                        icon="el-icon-circle-check"
+                        @click="closeAnAccount(scope.row)"
+                ></el-button>
                 </template>
             </el-table-column>
             <el-table-column label="operation" align="center" class-name="small-padding fixed-width">
@@ -103,21 +116,31 @@
                 <el-button @click="cancel">cancel</el-button>
             </div>
         </el-dialog>
+        <el-dialog title="wallet particulars" :visible.sync="walletDesc" width="600px">
+            <el-table :data="walletList" empty-text="no data">
+                <el-table-column label="viewer" align="center" prop="viewer" width="180" />
+                <el-table-column label="token" align="center" prop="token" width="180" />
+                <el-table-column label="time" align="center" prop="updatedDate" width="180" />
+            </el-table>
+        </el-dialog>
     </div>
 
 </template>
 
 <script>
-    import { performerList,getmyprofile,setperformerstatus,walletListByPerformer } from '@/api/login'
+    import { closeAnAccount ,performerList,getmyprofile,setperformerstatus,walletListByPerformer } from '@/api/login'
+    import { formatDate } from "@/utils/index";
     export default {
         name: "performer",
         data(){
             return {
                 performerList:[],//演出者列表
                 title:'',
+                walletType:false,
+                walletList:[],
                 updPasw:false,//是否可以修改密码
                 openEditCore:false,//添加演出者弹框
-                walletType:false,//礼物明细弹框
+                walletDesc:false,//礼物明细弹框
                 performerForm:{
                     name:'',
                     alias:'',
@@ -159,7 +182,20 @@
                         this.performerList = res.data.items;
                     }
                 })
-
+            },
+            //查询钱包明细
+            getWalletDesc(user){
+                walletListByPerformer({
+                    performer : user.id
+                }).then(res => {
+                    if (res.code === 100) {
+                        this.walletList = res.data.items
+                        this.walletList.map(item => {
+                            item.updatedDate = formatDate(item.updatedDate)
+                        })
+                        this.walletDesc = true;
+                    }
+                })
             },
             //打开添加演出者弹框
             handleAdd() {
@@ -215,6 +251,17 @@
                     }
                 }).catch(err => {
                     alert(err)
+                })
+            },
+            //结算
+            closeAnAccount(row){
+                closeAnAccount({
+                    performerid:row.id
+                }).then(res => {
+                    if (res.code === 100) {
+                        this.msgSuccess('Close An Account Success');
+                        this.getPerformerList();
+                    }
                 })
             },
             //查询礼物明细
