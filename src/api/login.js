@@ -125,6 +125,22 @@ export function closeAnAccount(data) {
     params:data
   })
 }
+//修改演出者个人信息
+export function updatePerformer(data) {
+  return request({
+    url: '/performer/updatePerformer',
+    method: 'post',
+    params:data
+  })
+}
+//通过视频id查询token
+export function walletListByVideo(data) {
+  return request({
+    url: '/user/walletListByVideo',
+    method: 'get',
+    params:data
+  })
+}
 //修改演出者账号状态
 export function setperformerstatus(userid,status) {
   const data = {

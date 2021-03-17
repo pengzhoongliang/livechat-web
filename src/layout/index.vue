@@ -9,7 +9,7 @@
     <sidebar class="sidebar-container" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <navbar :navbarType="false" />
+        <!--<navbar :navbarType="false" />-->
         <tags-view v-if="needTagsView" />
       </div>
       <app-main />
@@ -20,6 +20,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import RightPanel from '@/components/RightPanel'
