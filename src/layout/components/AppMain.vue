@@ -38,16 +38,6 @@
       this.getPerformerList();
     },
     methods:{
-      getPerformerList(){
-        this.$axios({
-          method:'get',
-          url:"https://api.networkgateway.net/api/v1/core/performer"
-        }).then(res => {
-          if (res.data.code === 100){
-            this.performerList = res.data.data.items;
-          }
-        })
-      },
       //打开添加演出者弹框
      handleAdd() {
        this.openEditCore = true;
@@ -56,22 +46,6 @@
       cancel(){
         this.openEditCore = false;
       },
-      //添加演出者
-      submitForm(){
-        this.$axios({
-          method:'post',
-          url:'https://api.networkgateway.net/api/v1/core/register',
-          params:this.performerForm
-        }).then(res => {
-          if (res.data.code === 100){
-            this.openEditCore = false;
-            this.msgSuccess("add success!");
-          }else {
-            this.$message.error('error!');
-          }
-        })
-
-      }
     }
   }
 </script>

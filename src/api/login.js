@@ -125,6 +125,22 @@ export function closeAnAccount(data) {
     params:data
   })
 }
+//获取视频点赞数
+export function likeCountByVideoId(data) {
+  return request({
+    url: '/core/likecount',
+    method: 'get',
+    params:data
+  })
+}
+//获取观看数
+export function viewCountByVideoId(data) {
+  return request({
+    url: '/core/viewcount',
+    method: 'get',
+    params:data
+  })
+}
 //修改演出者个人信息
 export function updatePerformer(data) {
   return request({

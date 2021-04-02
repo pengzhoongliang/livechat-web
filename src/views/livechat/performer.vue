@@ -218,7 +218,7 @@
                             //新增
                 this.$axios({
                     method:'post',
-                    url:'https://api.networkgateway.net/api/v1/core/register',
+                    url:process.env.VUE_APP_ROCKET+'/core/register',
                     params:this.performerForm
                 }).then(res => {
                     if (res.data.code === 100){

@@ -100,7 +100,7 @@ export default {
     },
     logoutRocker(){
       this.$axios({
-        url:'https://api.networkgateway.net:3021/api/v1/logout',
+        url:process.env.VUE_APP_ROCKET+'/logout',
         method:'post',
         headers:{
           'X-Auth-Token': localStorage.getItem('xToken'),

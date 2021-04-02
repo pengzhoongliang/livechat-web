@@ -37,7 +37,7 @@
           </template>
         </el-table-column>
         <el-table-column label="Like Total" sortable align="center" prop="likelist"  />
-        <el-table-column label="View Total" sortable align="center" prop="followlist"  />
+        <el-table-column label="View Total" sortable align="center" prop="viewTotal"  />
         <el-table-column label="Operation" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button
@@ -149,7 +149,7 @@
 </template>
 
 <script>
-    import { walletListByVideo,listfollower,updatePerformer,walletListByPerformer,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
+    import { walletListByVideo,likeCountByVideoId,viewCountByVideoId,listfollower,updatePerformer,walletListByPerformer,deleteVideo,registervideo,getvideoinfo,updatevideo,setvideoflag,getmyprofile } from '@/api/login'
     import { formatDate } from "@/utils/index";
     import SHA256 from "crypto-js/sha256"
     import { getToken } from '@/utils/auth'
@@ -251,8 +251,21 @@
                         //this.videoList = res.data.items;//赋值视频列表
                       var i = 0;
                       res.data.items.map(item => {
-                        item.followlist = item.followlist.length;
-                        item.likelist = item.likelist.length;
+                        /*item.followlist = item.followlist.length;
+                        item.likelist = item.likelist.length;*/
+                        //获取点赞数
+                        likeCountByVideoId({videoid:item.id}).then(like => {
+                          if (like.code === 100){
+                            item.likelist = like.data
+                          }
+                        })
+                         //获取观看数
+                        viewCountByVideoId({videoid:item.id}).then(view => {
+                          if (view.code === 100){
+                            item.viewTotal = view.data
+                          }
+                        })
+
                         //通过视频id获取token数
                         walletListByVideo({videoid:item.id}).then(re => {
                           let tokenCount = 0;
@@ -365,7 +378,7 @@
           //修改rocket的密码
           updateRocketPas(form){
             this.$axios({
-              url:'https://api.networkgateway.net:3021/api/v1/users.updateOwnBasicInfo',
+              url:process.env.VUE_APP_ROCKET+'/users.updateOwnBasicInfo',
               method:'post',
               headers:{
                 'X-Auth-Token': localStorage.getItem('xToken'),
@@ -388,21 +401,22 @@
                           this.performerType = false;
                           this.msgSuccess("Update Success!");
                       }else {
-                          this.$message.error('Error!');
+                          this.msgError('Error!');
                       }
                   }).catch(err => {
-                      this.$message.error(err);
+                    this.msgError(err.msg);
                   })
               }
+              this.msgError(err.msg);
             }).catch(err => {
-                console.log('错误了',err)
-                this.$message.error(err);
+              console.log('错误了',err)
+              this.msgError('Error in original password');
             })
           },
           //创建视频聊天频道
           channelsCreate(name){
             this.$axios({
-              url:'https://api.networkgateway.net:3021/api/v1/channels.create',
+              url:process.env.VUE_APP_ROCKET+'/channels.create',
               method:'post',
               headers:{
                 'X-Auth-Token': localStorage.getItem('xToken'),
@@ -489,7 +503,7 @@
           },
             logout(){
                 this.$axios({
-                    url:'https://api.networkgateway.net:3021/api/v1/logout',
+                    url:process.env.VUE_APP_ROCKET+'/logout',
                     method:'post',
                     headers:{
                         'X-Auth-Token': 'rxjMOjxyEMHPpHDMQbFyhgHB1F4WkHxs3cphsoiRoQV',

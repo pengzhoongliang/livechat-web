@@ -164,7 +164,7 @@
         //同时登录火箭聊天
         loginRocket(data){
             this.$axios({
-                url:'https://api.networkgateway.net:3021/api/v1/login',
+                url:process.env.VUE_APP_ROCKET+'/login',
                 method:'post',
                 data:{
                     user:data.username,
@@ -198,7 +198,7 @@
         createRocketChat(user){
           let email = this.email;
           this.$axios({
-              url:'https://api.networkgateway.net:3021/api/v1/users.register',
+              url:process.env.VUE_APP_ROCKET+'/users.register',
               method:'post',
               data:{
                 name:user.username,

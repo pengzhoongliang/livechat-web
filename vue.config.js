@@ -36,7 +36,7 @@ module.exports = {
         //target: `http://cc.link.newsupplytech.com`,
         // target: `http://wmhm.longxindg.com/dev-api`,
         // target: `http://api.networkgateway.net/api/v1`,
-        target:`target:process.env.VUE_APP_URL`,
+        target:process.env.VUE_APP_URL,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''

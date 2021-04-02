@@ -1,6 +1,6 @@
 <template>
   <div :class="{'has-logo':showLogo}">
-    <!-- <logo v-if="showLogo" :collapse="isCollapse" /> -->
+<!--     <logo v-if="showLogo" :collapse="isCollapse" />-->
     <!-- :background-color="variables.menuBg"  //背景颜色 -->
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
@@ -12,7 +12,21 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
+<!--        <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />-->
+        <el-menu-item index="1">
+            <router-link to="/system">
+                <i class="el-icon-video-camera-solid">
+                    <span slot="title" style="padding-left: 20px">Video List</span>
+                </i>
+            </router-link>
+        </el-menu-item>
+          <el-menu-item index="2">
+              <router-link to="/system">
+                  <i class="el-icon-menu">
+                      <span slot="title" style="padding-left: 20px">More</span>
+                  </i>
+              </router-link>
+          </el-menu-item>
       </el-menu>
     </el-scrollbar>
   </div>
